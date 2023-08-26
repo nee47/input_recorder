@@ -1,6 +1,7 @@
 import keyboard
 import pyautogui as pa 
-
+import time
+import threading
 
 x, y = pa.position()
 combinacion_teclas = 'ctrl+1'
@@ -15,29 +16,32 @@ keyboard.add_hotkey(combinacion_teclas, my_function)
 
 keyboard.wait("esc")
 
-import tkinter as tk
+class InputRecorder():
+    def __init__(self):
+        self.recording = False
+        self.playing = False
+        self.coordinates = []
+        self.stop_event = threading.Event()
+        self.thread = None
 
-def button1_click():
-    label.config(text="Botón 1 fue presionado")
+    def stop(self):
+        pass
 
-def button2_click():
-    label.config(text="Botón 2 fue presionado")
-   
+    def play(self):
+        pass
 
-# Crear la ventana principal
-root = tk.Tk()
-root.title("Interfaz con Botones")
+    def _store_coordinates(self):
+        while not self.stop_event.is_set():
+            self.coordinates.append(pa.position())
+            time.sleep(0.1)
 
-# Crear etiqueta para mostrar mensajes
-label = tk.Label(root, text="")
-label.pack()
+    def start_recording(self):
+        self.thread = threading.Thread(target=self._store_coordinates)
+        self.thread.start()
 
-# Crear botones
-button1 = tk.Button(root, text="Botón 1", command=button1_click)
-button1.pack()
+    def show_coordinates(self):
+        print(self.coordinates)
 
-button2 = tk.Button(root, text="Botón 2", command=button2_click)
-button2.pack()
-
-# Iniciar el bucle de eventos
-root.mainloop()
+    def stop_recording(self):
+        self.stop_event.set()
+        self.thread.join()
